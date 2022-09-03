@@ -33,6 +33,40 @@ app.get("/", (req: Request, res: Response) => {
   res.send("Hello World!").status(200);
 });
 
+app.get("/api/", async (req: Request, res: Response) => {
+  const times = await db.fetch();
+  res.send(times).status(200);
+});
+
+app.post("/api/new", async (req: Request, res: Response) => {
+  const { addedAt, countdownTo } = req.body;
+  // JSON.parse(Object.keys(req.body)[0])
+
+  let newItem;
+  try {
+    newItem = await db.put({
+      addedAt,
+      countdownTo,
+    });
+  } catch (e) {
+    res.status(500).send(e);
+  }
+
+  res.send(newItem).status(200);
+});
+
+app.post("/api/delete/:id", async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  try {
+    await db.delete(id);
+  } catch (e) {
+    res.status(500).send(e);
+  }
+
+  res.status(204).send();
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running on PORT ${PORT} 🚀`);
 });
